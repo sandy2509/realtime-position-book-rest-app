@@ -104,6 +104,43 @@ public class PositionBookServiceTest {
         assertEquals(Long.valueOf(expectedRemainingQuantity), Long.valueOf(tradeOrderResponse.getQuantity()));
     }
 
+
+    @Test
+    public void shouldExecuteValidBuyTradeEventForTwoDifferentTransaction() throws TradeOrderException {
+        long buyOrderQuantity = 600L;
+        long expectedRemainingQuantity = 1200L;
+        int expectedOrderCountAfterTrade = 2;
+
+        TradeOrder firstTradeOrder = new TradeOrder.TradeOrderBuilder()
+                .addTradeId(0L)
+                .addAccountId("ABC1")
+                .addSecurityId("XYZ1")
+                .addTradeEventType(TradeEventType.BUY)
+                .addQuantity(buyOrderQuantity).build();
+
+        TradeOrder secondTradeOrder = new TradeOrder.TradeOrderBuilder()
+                .addTradeId(0L)
+                .addAccountId("ABC1")
+                .addSecurityId("XYZ1")
+                .addTradeEventType(TradeEventType.BUY)
+                .addQuantity(buyOrderQuantity).build();
+        try {
+            underTest.executeTradeEvent(firstTradeOrder);
+            underTest.executeTradeEvent(secondTradeOrder);
+        } catch (TradeOrderException e) {
+            Logger.logMessage("Message : " + e.getMessage());
+            assertNull(e.toString(), e);
+        }
+
+
+        TradeOrderResponse tradeOrderResponse = underTest.getRealTimePositionOfTradeEvent("ABC1", "XYZ1");
+
+        Logger.logMessage("TradeOrderResponse generated is: "+tradeOrderResponse);
+
+        assertEquals(expectedOrderCountAfterTrade, tradeOrderResponse.getTradeOrder().size());
+        assertEquals(Long.valueOf(expectedRemainingQuantity), Long.valueOf(tradeOrderResponse.getQuantity()));
+    }
+
     @Test
     public void shouldExecuteValidSellTradeEvent() throws TradeOrderException {
         long sellOrderQuantity = 100L;
