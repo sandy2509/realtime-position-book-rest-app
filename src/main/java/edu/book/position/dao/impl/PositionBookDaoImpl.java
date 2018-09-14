@@ -19,15 +19,13 @@ public class PositionBookDaoImpl implements PositionBookDao {
 
     @Override
     public TradeOrder saveTradeEvent(TradeOrder tradeOrder) throws TradeOrderException {
-        if (tradeOrder.getTradeEventType() == TradeEventType.CANCEL && tradeOrders.stream().anyMatch(trade->trade.getTradeId() == tradeOrder.getTradeId())) {
+        if (tradeOrder.getTradeEventType() == TradeEventType.CANCEL && tradeOrders.stream().anyMatch(trade -> trade.getTradeId() == tradeOrder.getTradeId())) {
             tradeOrders.replaceAll(trade -> {
-                trade.setTradeEventType(trade.getTradeEventType());
-                trade.setQuantity(trade.getQuantity()-tradeOrder.getQuantity());
+                trade.setQuantity(trade.getQuantity() - tradeOrder.getQuantity());
                 return trade;
             });
-        } else {
-            tradeOrders.add(tradeOrder);
         }
+        tradeOrders.add(tradeOrder);
         return tradeOrder;
     }
 

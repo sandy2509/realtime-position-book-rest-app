@@ -41,10 +41,6 @@ public class TradeOrder {
         return tradeEventType;
     }
 
-    public void setTradeEventType(TradeEventType tradeEventType) {
-        this.tradeEventType = tradeEventType;
-    }
-
     public static class TradeOrderBuilder {
         private long tradeId;
         private String securityId;

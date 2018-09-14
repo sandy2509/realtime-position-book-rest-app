@@ -119,7 +119,7 @@ public class PositionBookServiceTest {
                 .addQuantity(buyOrderQuantity).build();
 
         TradeOrder secondTradeOrder = new TradeOrder.TradeOrderBuilder()
-                .addTradeId(0L)
+                .addTradeId(1L)
                 .addAccountId("ABC1")
                 .addSecurityId("XYZ1")
                 .addTradeEventType(TradeEventType.BUY)
@@ -142,38 +142,11 @@ public class PositionBookServiceTest {
     }
 
     @Test
-    public void shouldExecuteValidSellTradeEvent() throws TradeOrderException {
-        long sellOrderQuantity = 100L;
-        long expectedRemainingQuantity = -100L;//minus denotes short-selling and buy order hasn't been executed
-        int expectedOrderCountAfterTrade = 1;
-
-        TradeOrder tradeOrder = new TradeOrder.TradeOrderBuilder()
-                .addTradeId(0L)
-                .addAccountId("ABC2")
-                .addSecurityId("XYZ2")
-                .addTradeEventType(TradeEventType.SELL)
-                .addQuantity(sellOrderQuantity).build();
-
-        try {
-            tradeOrder = underTest.executeTradeEvent(tradeOrder);
-        } catch (TradeOrderException e) {
-            Logger.logMessage("Message : " + e.getMessage());
-            assertNull(e.toString(), e);
-        }
-
-        TradeOrderResponse tradeOrderResponse = underTest.getRealTimePositionOfTradeEvent("ABC2", "XYZ2");
-
-        assertEquals(expectedOrderCountAfterTrade, tradeOrderResponse.getTradeOrder().size());
-        assertSame(tradeOrder,tradeOrderResponse.getTradeOrder().get(0));
-        assertEquals(Long.valueOf(expectedRemainingQuantity), Long.valueOf(tradeOrderResponse.getQuantity()));
-    }
-
-    @Test
     public void shouldExecuteCancelEventOnBuyOrder() throws TradeOrderException {
         long buyOrderQuantity = 100L;
         long cancelOrderQuantity = 40L;
         long expectedRemainingQuantity = 60L;
-        int expectedOrderCountAfterTrade = 1;
+        int expectedOrderCountAfterTrade = 2;
 
         TradeOrder buyOrder = new TradeOrder.TradeOrderBuilder()
                 .addTradeId(0L)
@@ -206,9 +179,8 @@ public class PositionBookServiceTest {
         }
 
 
-
         TradeOrderResponse tradeOrderResponse = underTest.getRealTimePositionOfTradeEvent("ABC3", "XYZ3");
-
+        System.out.println(tradeOrderResponse);
         assertEquals(expectedOrderCountAfterTrade, tradeOrderResponse.getTradeOrder().size());
         assertEquals(Long.valueOf(expectedRemainingQuantity), Long.valueOf(tradeOrderResponse.getQuantity()));
     }
@@ -219,7 +191,7 @@ public class PositionBookServiceTest {
         long sellOrderQuantity = 100L;
         long cancelOrderQuantity = 40L;
         long expectedRemainingQuantity = -60L; //minus denotes short-selling and buy order hasn't been executed
-        int expectedOrderCountAfterTrade = 1;
+        int expectedOrderCountAfterTrade = 2;
 
         TradeOrder sellOrder = new TradeOrder.TradeOrderBuilder()
                 .addTradeId(0L)
